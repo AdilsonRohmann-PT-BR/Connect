@@ -1,4 +1,4 @@
-
+const authRoutes = require("./routes/auth.routes");
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
@@ -14,6 +14,7 @@ const PORT = process.env.PORT || 3000;
 // Configurações
 app.use(cors());
 app.use(express.json());
+app.use("/api/auth", authRoutes);
 
 // Rota inicial de teste
 app.get("/", (req, res) => {
@@ -30,6 +31,6 @@ app.get("/api/health", (req, res) => {
 });
 
 // Iniciar servidor
-app.listen(PORT, () => {
-    console.log(`Connect rodando na porta ${PORT}`);
+    app.listen(PORT, () => {
+  console.log(`Connect rodando na porta ${PORT}`);
 });
