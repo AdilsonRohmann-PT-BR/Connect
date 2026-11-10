@@ -65,10 +65,13 @@ router.post("/register", async (req, res) => {
         });
 
     } catch (error) {
-        return res.status(500).json({
-            error: "Erro interno ao cadastrar usuário."
-        });
-    }
+    console.error("ERRO NO CADASTRO:", error);
+
+    return res.status(500).json({
+        error: "Erro interno ao cadastrar usuário."
+    });
+}
+    
 });
 
 // LOGIN

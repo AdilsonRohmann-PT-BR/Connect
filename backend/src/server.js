@@ -1,11 +1,10 @@
-const authRoutes = require("./routes/auth.routes");
 const express = require("express");
 const cors = require("cors");
+
 require("dotenv").config();
+
 const supabase = require("./config/supabase");
-
-
-
+const authRoutes = require("./config/routes/auth.routes");
 
 
 const app = express();
