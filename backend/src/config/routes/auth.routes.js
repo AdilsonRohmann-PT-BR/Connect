@@ -94,10 +94,17 @@ router.post("/login", async (req, res) => {
             });
 
         if (error) {
-            return res.status(401).json({
-                error: "Email ou senha incorretos."
-            });
-        }
+    console.error("ERRO REAL DO SUPABASE:", {
+        status: error.status,
+        code: error.code,
+        message: error.message
+    });
+
+    return res.status(401).json({
+        error: "Falha na autenticação.",
+        code: error.code
+    });
+}
 
         return res.json({
             message: "Login realizado com sucesso!",
