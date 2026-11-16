@@ -1,3 +1,4 @@
+
 const path = require("path");
 
 require("dotenv").config({
@@ -8,6 +9,7 @@ const express = require("express");
 const cors = require("cors");
 
 const conversationRoutes = require("./config/routes/conversation.routes");
+const messagesRoutes = require("./config/routes/messages.routes");
 const requireAuth = require("./middleware/auth.middleware");
 const authRoutes = require("./config/routes/auth.routes");
 const profileRoutes = require("./config/routes/profile.routes");
@@ -23,6 +25,7 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/profile", profileRoutes);
 app.use("/api/conversations", conversationRoutes);
+app.use("/api/messages", messagesRoutes);
 
 // Usuário autenticado
 app.get("/api/me", requireAuth, (req, res) => {
