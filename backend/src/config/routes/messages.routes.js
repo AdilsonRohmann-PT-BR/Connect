@@ -9,7 +9,6 @@ const router = express.Router();
 router.get("/:conversationId", requireAuth, async (req, res) => {
     try {
         const { conversationId } = req.params;
-
         const supabase = createUserClient(req.accessToken);
 
         // Verificar participação
@@ -28,7 +27,7 @@ router.get("/:conversationId", requireAuth, async (req, res) => {
         }
 
         // Buscar mensagens
-        const { data, error } = await supabase
+        const { data: messages, error } = await supabase
             .from("messages")
             .select("*")
             .eq("conversation_id", conversationId)
@@ -42,8 +41,44 @@ router.get("/:conversationId", requireAuth, async (req, res) => {
             });
         }
 
+        // Identificar os remetentes
+        const senderIds = [
+            ...new Set(messages.map(message => message.sender_id))
+        ];
+
+        // Buscar os perfis dos remetentes
+        let profiles = [];
+
+        if (senderIds.length > 0) {
+            const { data: profileData, error: profileError } =
+                await supabase
+                    .from("profiles")
+                    .select("id, username, display_name, avatar_url")
+                    .in("id", senderIds);
+
+            if (profileError) {
+                console.error(profileError);
+
+                return res.status(400).json({
+                    error: "Erro ao buscar perfis dos usuários."
+                });
+            }
+
+            profiles = profileData || [];
+        }
+
+        // Associar cada mensagem ao perfil do remetente
+        const profileMap = new Map(
+            profiles.map(profile => [profile.id, profile])
+        );
+
+        const messagesWithProfiles = messages.map(message => ({
+            ...message,
+            sender: profileMap.get(message.sender_id) || null
+        }));
+
         return res.status(200).json({
-            messages: data
+            messages: messagesWithProfiles
         });
 
     } catch (error) {
@@ -62,7 +97,7 @@ router.post("/:conversationId", requireAuth, async (req, res) => {
         const { conversationId } = req.params;
         const { content } = req.body || {};
 
-        if (!content || !content.trim()) {
+        if (typeof content !== "string" || !content.trim()) {
             return res.status(400).json({
                 error: "A mensagem não pode estar vazia."
             });
